@@ -7,10 +7,14 @@
 - LMS 自适应：w <- w + mu * e * x_vec，让 w 逐步逼近真实回声路径 h
 - 可视化：第 1 / 10 / 50 / 100 "帧"时，滤波器输出 y 如何逼近真实回声
 """
+import os
 import numpy as np
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+
+# 输出与本脚本同目录，避免硬编码绝对路径
+base = os.path.join(os.path.dirname(os.path.abspath(__file__)), "")
 
 matplotlib.rcParams["font.sans-serif"] = ["Microsoft YaHei", "SimHei", "DejaVu Sans"]
 matplotlib.rcParams["axes.unicode_minus"] = False
@@ -92,7 +96,7 @@ for ax, fr in zip(axes.ravel(), snap_frames):
     ax.grid(alpha=0.3)
 fig.suptitle("LMS 权重逐步逼近真实回声路径", fontsize=14)
 fig.tight_layout()
-fig.savefig("E:/Android/signals_and_systems/aec_weights.png", dpi=110)
+fig.savefig(base + "aec_weights.png", dpi=110)
 
 # ---------- 5. 可视化 B：输出波形逼近真实回声 ----------
 # 用每个快照的权重，重新算一段输出，和真实回声比
@@ -109,7 +113,7 @@ for ax, fr in zip(axes2.ravel(), snap_frames):
     ax.grid(alpha=0.3)
 fig2.suptitle("滤波器输出如何一步步逼近真实回声", fontsize=14)
 fig2.tight_layout()
-fig2.savefig("E:/Android/signals_and_systems/aec_output.png", dpi=110)
+fig2.savefig(base + "aec_output.png", dpi=110)
 
 # ---------- 6. 收敛曲线：误差能量随时间下降 ----------
 win = 200
@@ -122,7 +126,7 @@ ax3.set_xlabel("时间 (秒)")
 ax3.set_ylabel("残余/输入 能量比 (dB)")
 ax3.grid(alpha=0.3)
 fig3.tight_layout()
-fig3.savefig("E:/Android/signals_and_systems/aec_converge.png", dpi=110)
+fig3.savefig(base + "aec_converge.png", dpi=110)
 
 # ---------- 打印数值证据 ----------
 def db(a, b):
@@ -148,7 +152,6 @@ def save_wav(path, sig, fs):
         wf.setframerate(fs)
         wf.writeframes(pcm.tobytes())
 
-base = "E:/Android/signals_and_systems/"
 save_wav(base + "aec_1_reference.wav", x, fs)   # 远端参考（扬声器放的）
 save_wav(base + "aec_2_mic.wav",       d, fs)   # 麦克风收到的（被回声污染）
 save_wav(base + "aec_3_cleaned.wav",   e, fs)   # LMS 消除后（送出去的干净信号）

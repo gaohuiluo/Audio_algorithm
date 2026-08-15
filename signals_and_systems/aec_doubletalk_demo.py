@@ -5,10 +5,14 @@
   A. 不做双讲检测，一路更新       -> 近端说话段权重发散，路径估计被毁
   B. 简单能量比 DTD，双讲时冻结更新 -> 权重稳住
 """
+import os
 import numpy as np
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+
+# 输出与本脚本同目录，避免硬编码绝对路径
+base = os.path.join(os.path.dirname(os.path.abspath(__file__)), "")
 
 matplotlib.rcParams["font.sans-serif"] = ["Microsoft YaHei", "SimHei", "DejaVu Sans"]
 matplotlib.rcParams["axes.unicode_minus"] = False
@@ -82,7 +86,7 @@ ax.set_xlabel("时间 (秒)"); ax.set_ylabel("‖w - h‖ (越低=路径估计�
 ax.set_title("双讲对自适应滤波器的破坏 & DTD 的作用")
 ax.legend(loc="upper left", fontsize=9); ax.grid(alpha=0.3)
 fig.tight_layout()
-fig.savefig("E:/Android/signals_and_systems/aec_doubletalk.png", dpi=110)
+fig.savefig(base + "aec_doubletalk.png", dpi=110)
 
 print(f"不做DTD: 双讲结束时权重误差 = {en_no[int(3.0*fs)-1]:.3f}")
 print(f"带 DTD : 双讲结束时权重误差 = {en_dtd[int(3.0*fs)-1]:.3f}")
