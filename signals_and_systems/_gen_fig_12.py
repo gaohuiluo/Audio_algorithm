@@ -70,3 +70,45 @@ plt.tight_layout()
 plt.savefig("fig_12_1_1.png", dpi=110)
 print("saved fig_12_1_1.png  fs=", fs, " N=", N, " f0=", f0,
       " bin spacing=", fs / N, "Hz")
+
+# ---------- fig_12_1_2.png: DTFT 是连续曲线, DFT 只是曲线上的采样点 ----------
+# 以两点信号 x=[1,1] 为例: |X(e^{jw})| = 2|cos(w/2)| (手算可得)
+# N=2 的 DFT 采 2 个点; 补零到 N=4 后在同一条曲线上采 4 个更密的点
+fig2, ax2 = plt.subplots(figsize=(10, 4.5))
+
+w = np.linspace(0, 2 * np.pi, 2000)
+ax2.plot(w, 2 * np.abs(np.cos(w / 2)), color="#2471a3", lw=2,
+         label=r"DTFT of x=[1,1]:  $|X(e^{j\omega})|=2|\cos(\omega/2)|$"
+               "  (a CONTINUOUS curve)")
+
+wk2 = np.pi * np.arange(2)                      # N=2: w_k = pi*k
+ax2.plot(wk2, np.abs(np.fft.fft([1, 1])), "o", ms=11, color="#c0392b",
+         label="DFT, N=2:  fft([1,1]) = [2, 0]  (2 samples ON the curve)")
+
+wk4 = 2 * np.pi * np.arange(4) / 4              # N=4: w_k = 2*pi*k/4
+ax2.plot(wk4, np.abs(np.fft.fft([1, 1, 0, 0])), "x", ms=11, mew=2.5,
+         color="#1e8449",
+         label="DFT, N=4 (zero-padded):  |fft([1,1,0,0])| = "
+               "[2, 1.41, 0, 1.41]  (denser samples, SAME curve)")
+
+ax2.axvspan(np.pi, 2 * np.pi, color="gray", alpha=0.12)
+ax2.text(1.5 * np.pi, 1.85, "mirror / alias zone\n(beyond Nyquist)",
+         ha="center", fontsize=9, color="gray")
+ax2.axvline(np.pi, color="gray", ls="--", lw=1)
+ax2.set_xticks([0, np.pi / 2, np.pi, 3 * np.pi / 2, 2 * np.pi])
+ax2.set_xticklabels(["0", r"$\pi/2$", r"$\pi$  (Nyquist, $f_s/2$)",
+                     r"$3\pi/2$", r"$2\pi$  (= $f_s$, one period)"],
+                    fontsize=9)
+ax2.set_ylim(-0.12, 2.3)
+ax2.set_xlabel(r"normalized frequency $\omega$ (rad/sample)")
+ax2.set_ylabel(r"$|X|$")
+ax2.set_title("DFT = samples of the DTFT curve.  Zero-padding = sampling "
+              "the SAME curve more densely (interpolation, not resolution)",
+              fontsize=10)
+ax2.legend(loc="lower left", fontsize=9)
+ax2.grid(True, alpha=0.3)
+
+plt.tight_layout()
+plt.savefig("fig_12_1_2.png", dpi=110)
+print("saved fig_12_1_2.png  |fft([1,1])| =", np.abs(np.fft.fft([1, 1])),
+      " |fft([1,1,0,0])| =", np.round(np.abs(np.fft.fft([1, 1, 0, 0])), 4))
