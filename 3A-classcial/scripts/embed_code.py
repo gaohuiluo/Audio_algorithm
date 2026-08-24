@@ -38,10 +38,19 @@ def dead_link_re(series: str):
     return re.compile(rf"^.*code/series-{re.escape(series)}\.py.*$", re.MULTILINE)
 
 
+def find_md(series: str) -> Path | None:
+    """定位正文：优先 series-N.md，其次任意以 -N.md 结尾的中文命名正文。"""
+    p = POSTS / f"series-{series}.md"
+    if p.exists():
+        return p
+    cands = sorted(POSTS.glob(f"*-{series}.md"))
+    return cands[0] if cands else None
+
+
 def process(series: str) -> str:
-    md_path = POSTS / f"series-{series}.md"
+    md_path = find_md(series)
     py_path = CODE / f"series-{series}.py"
-    if not md_path.exists() or not py_path.exists():
+    if md_path is None or not py_path.exists():
         return f"跳过 {series}：缺 md 或 py"
 
     text = md_path.read_text(encoding="utf-8")

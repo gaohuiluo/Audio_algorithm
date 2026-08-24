@@ -81,12 +81,21 @@ def _env():
     return dict(os.environ)
 
 
+def find_md(series: str) -> Path | None:
+    """定位正文：优先 series-N.md，其次任意以 -N.md 结尾的中文命名正文。"""
+    p = POSTS / f"series-{series}.md"
+    if p.exists():
+        return p
+    cands = sorted(POSTS.glob(f"*-{series}.md"))
+    return cands[0] if cands else None
+
+
 def gate(series: str) -> list[str]:
     errs = []
-    md = POSTS / f"series-{series}.md"
+    md = find_md(series)
     py = CODE / f"series-{series}.py"
-    if not md.exists():
-        return [f"[缺正文] {md.name} 不存在"]
+    if md is None:
+        return [f"[缺正文] series-{series}.md 不存在"]
     errs += check_post(md)
     errs += run_code(py)
     return errs
